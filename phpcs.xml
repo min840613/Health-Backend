@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<ruleset name="Custom">
+    <arg name="colors"/>
+    <arg name="basepath" value="."/>
+
+    <file>./app</file>
+
+    <!-- relative path from PHPCS source location -->
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <rule ref="Squiz.WhiteSpace.FunctionSpacing">
+        <properties>
+            <property name="spacing"            value="1" />
+            <property name="spacingBeforeFirst" value="0" />
+            <property name="spacingAfterLast"   value="0" />
+        </properties>
+    </rule>
+
+    <rule ref="PSR1">
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+    </rule>
+
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+
+    <rule ref="Generic.Files.LineLength.TooLong"/>
+
+
+    <rule ref="Squiz.Classes.ValidClassName.NotCamelCaps"/>
+
+
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore"/>
+
+    <!-- laravel Kernel RouteServiceProvider 不檢查 -->
+    <rule ref="Squiz.PHP.CommentedOutCode.Found">
+        <exclude-pattern>app/Providers/RouteServiceProvider.php</exclude-pattern>
+        <exclude-pattern>app/Console/Kernel.php</exclude-pattern>
+        <exclude-pattern>app/Http/Kernel.php</exclude-pattern>
+        <exclude-pattern>routes/*</exclude-pattern>
+        <exclude-pattern>database/*</exclude-pattern>
+    </rule>
+
+    <!--    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClass">-->
+    <!--        <exclude-pattern>./app/Providers/RouteServiceProvider.php</exclude-pattern>-->
+    <!--    </rule>-->
+
+    <rule ref="PSR12">
+        <exclude-pattern>app/Console/Kernel.php</exclude-pattern>
+    </rule>
+
+    <!-- array 最後元素後要加 comma -->
+    <rule ref="Squiz.Arrays.ArrayDeclaration.NoCommaAfterLast"/>
+
+    <!-- 檢查類別成員、屬性上下的距離空白行 -->
+    <rule ref="Squiz.WhiteSpace.MemberVarSpacing">
+        <properties>
+            <property name="spacing" value="1"/>
+            <property name="spacingBeforeFirst" value="0"/>
+        </properties>
+    </rule>
+
+    <rule ref="PSR12.Files.FileHeader.SpacingAfterBlock">
+        <exclude-pattern>routes/*</exclude-pattern>
+    </rule>
+
+    <!-- 禁止使用長陣列 -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+    <!-- 檢查空白行 -->
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+
+    <!-- 檢查運算子前後的空白 -->
+    <rule ref="Squiz.WhiteSpace.OperatorSpacing">
+        <properties>
+            <property name="ignoreNewlines" value="true"/>
+        </properties>
+    </rule>
+
+    <!-- 檢查註解的程式碼 -->
+    <rule ref="Squiz.PHP.CommentedOutCode">
+        <properties>
+            <property name="maxPercentage" value="80"/>
+        </properties>
+    </rule>
+
+    <!-- 循環複雜度限制 -->
+    <rule ref="Generic.Metrics.CyclomaticComplexity">
+        <properties>
+            <property name="complexity" value="10"/>
+            <property name="absoluteComplexity" value="10"/>
+        </properties>
+        <!-- 忽略複雜度檢查 -->
+        <exclude name="Generic.Metrics.CyclomaticComplexity.MaxExceeded"/>
+    </rule>
+
+    <!-- 程式碼分析 -->
+    <rule ref="Generic.CodeAnalysis">
+        <exclude name="Generic.CodeAnalysis.AssignmentInCondition"/>
+        <exclude name="Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed"/>
+        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedFinally"/>
+        <exclude name="Generic.CodeAnalysis.EmptyStatement.DetectedCatch"/>
+    </rule>
+
+    <rule ref="Squiz.Commenting.FunctionComment">
+        <!-- 不需要 scalar style 的 type hint -->
+        <exclude name="Squiz.Commenting.FunctionComment.ScalarTypeHintMissing"/>
+        <!-- 不強制所有 type hint -->
+        <exclude name="Squiz.Commenting.FunctionComment.TypeHintMissing"/>
+        <!-- 不強制 @param 參數與 @throws 的說明 -->
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.EmptyThrows"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingReturnType"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidNoReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidNoReturn"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ExtraParamComment"/>
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfter"/>
+        <exclude name="Squiz.Commenting.FunctionComment.WrongStyle"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamNameNoMatch"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturnVoid"/>
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentNotCapital"/>
+        <exclude name="Squiz.Commenting.FunctionComment.ParamNameNoCaseMatch"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidTypeHint"/>
+        <!-- 不強制參數對齊 -->
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <!-- 接受 bool 或是 int 等，而不強制 integer 或是 boolean -->
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName"/>
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn"/>
+
+        <!-- 忽略有設定 Inheritdoc func comment -->
+        <properties>
+            <property name="skipIfInheritdoc" value="true"/>
+        </properties>
+
+        <!-- 不強制撰寫 func comment   -->
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+
+        <!-- 不強制撰寫 func comment 開頭字母大寫 -->
+        <exclude name="Squiz.Commenting.FunctionComment.ParamCommentNotCapital"/>
+
+        <!-- 不強制 trait use 分開 -->
+        <exclude name="PSR12.Traits.UseDeclaration"/>
+    </rule>
+
+    <!-- 忽略 func comment params -->
+    <rule ref="Squiz.Commenting.FunctionComment" />
+
+    <!-- for ci 跑的規則 / 本機會過 !-->
+    <exclude-pattern>*/database/*</exclude-pattern>
+    <exclude-pattern>*/config/*</exclude-pattern>
+    <exclude-pattern>*/public/*</exclude-pattern>
+    <exclude-pattern>./server.php</exclude-pattern>
+    <exclude-pattern>./tests/*</exclude-pattern>
+
+</ruleset>

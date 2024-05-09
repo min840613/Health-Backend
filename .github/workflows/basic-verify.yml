@@ -1,0 +1,46 @@
+name: basic-verify
+
+on:
+  pull_request:
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  aws:
+    uses: tvbstw/workflow_templates/.github/workflows/login-aws-ecr.yaml@master
+
+  composer:
+    name: composer
+    uses: tvbstw/workflow_templates/.github/workflows/composer.yaml@master
+    needs: [ "aws" ]
+    with:
+      registry: ${{ needs.aws.outputs.registry }}
+      image: ${{ vars.BASE_IMAGE }}
+      with_dev: true
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+    secrets:
+      composer_auth: ${{ secrets.token }}
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  unittest:
+    name: phpunit
+    uses: tvbstw/workflow_templates/.github/workflows/unittest.yaml@master
+    needs: [ "aws","composer" ]
+    with:
+      image: ${{ vars.BASE_IMAGE }}
+      registry: ${{ needs.aws.outputs.registry }}
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+    secrets:
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  phpcs:
+    name: phpcs
+    uses: tvbstw/workflow_templates/.github/workflows/coding-style.yaml@master
+    needs: [ "aws","composer" ]
+    with:
+      image: ${{ vars.BASE_IMAGE }}
+      registry: ${{ needs.aws.outputs.registry }}
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+    secrets:
+      docker_password: ${{ needs.aws.outputs.docker_password }}

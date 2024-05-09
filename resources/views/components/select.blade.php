@@ -1,0 +1,1 @@
+{!! Form::select($value['name'], $value['option'], old($value['name'])?old($value['name']):(isset($data) ? $data[$value['name']] : ''), ['class' => isset($value['class'])?'form-control '.$value['class']:'form-control', 'id' => isset($value['id'])?$value['id']:'', isset($value['required']) && $value['required'] == 1 ? 'required' : '']) !!}

@@ -1,0 +1,2 @@
+{!! Form::select($value['name'], $value['option'], isset($data) ? $data[$value['name']] : old($value['name']), ['class' => 'form-control', 'id' => 'input_' . $value['name'],'disabled' => 'disabled']) !!}
+{!! Form::input('hidden',$value['name'],$value['value']) !!}

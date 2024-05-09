@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["main", "main-staging"]
+
+jobs:
+  tests:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '8.0'
+      - run: mysql -uroot -h127.0.0.1 -e 'CREATE DATABASE `testing`'
+      - run: mysql -uroot -h127.0.0.1 -e 'CREATE DATABASE `testing_2022`'
+
+      - name: 設定php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: dom, curl
+          coverage: none
+
+      - name: 安裝composer套件
+        run: composer config --global github-oauth.github.com ${{secrets.COMPOSER_AUTH}} && composer install --no-interaction --prefer-dist
+
+      - name: 複製 testing example env
+        run: cp .env.testing.example .env.testing
+
+      - name: 準備laravel基礎設定
+        run: |
+          php artisan key:generate --env=testing
+
+      - name: 執行測試
+        run: php artisan test --env=testing
+
+      #- name: 通知
+      #  uses: act10ns/slack@v2.0.0
+      #  with:
+      #    webhook-url:
+      #    status: ${{ job.status }}
+      #    message: 你ㄉ程式碼在 {{ env.GITHUB_REF_NAME }} 這個 branch 已經通過測試囉
+

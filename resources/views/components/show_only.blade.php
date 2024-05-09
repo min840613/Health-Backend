@@ -1,0 +1,1 @@
+{!! Form::input('text', $value['name'],(isset($data) ? $data[$value['name']] : ''), ['class' => 'form-control disabled', 'id' => isset($value['id'])?$value['id']:'','disabled' => 'disabled']) !!}

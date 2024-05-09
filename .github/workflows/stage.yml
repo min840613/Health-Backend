@@ -1,0 +1,95 @@
+name: stage deploy
+
+on:
+  push:
+    branches: [ "main" ]
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  aws:
+    uses: tvbstw/workflow_templates/.github/workflows/login-aws-ecr.yaml@master
+
+  composer:
+    name: composer
+    uses: tvbstw/workflow_templates/.github/workflows/composer.yaml@master
+    needs: [ "aws" ]
+    with:
+      registry: ${{ needs.aws.outputs.registry }}
+      image: ${{ vars.BASE_IMAGE }}
+      with_dev: true
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+      composer_suffix: "stage"
+    secrets:
+      composer_auth: ${{ secrets.token }}
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  unittest:
+    name: phpunit
+    uses: tvbstw/workflow_templates/.github/workflows/unittest.yaml@master
+    needs: [ "aws","composer" ]
+    with:
+      image: ${{ vars.BASE_IMAGE }}
+      registry: ${{ needs.aws.outputs.registry }}
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+      composer_suffix: "stage"
+    secrets:
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  phpcs:
+    name: phpcs
+    uses: tvbstw/workflow_templates/.github/workflows/coding-style.yaml@master
+    needs: [ "aws","composer" ]
+    with:
+      image: ${{ vars.BASE_IMAGE }}
+      registry: ${{ needs.aws.outputs.registry }}
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+      composer_suffix: "stage"
+    secrets:
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  composer-stage:
+    name: composer stage
+    uses: tvbstw/workflow_templates/.github/workflows/composer.yaml@master
+    needs: [ "aws","phpcs" ]
+    with:
+      registry: ${{ needs.aws.outputs.registry }}
+      image: ${{ vars.BASE_IMAGE }}
+      with_dev: false
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+      composer_suffix: "stage"
+    secrets:
+      composer_auth: ${{ secrets.token }}
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  short-sha:
+    uses: tvbstw/workflow_templates/.github/workflows/short-sha.yaml@master
+
+  build-stage:
+    name: docker image
+    needs: [ "aws", "composer-stage", "short-sha" ]
+    uses: tvbstw/workflow_templates/.github/workflows/build-image.yaml@master
+    with:
+      registry: ${{ needs.aws.outputs.registry }}
+      repository: ${{ vars.ECR_REPOSITORY }}
+      image_tag: ${{ needs.short-sha.outputs.short_sha }}
+      image: ${{ vars.BASE_IMAGE }}
+      docker_username: ${{ needs.aws.outputs.docker_username }}
+      composer_suffix: "stage"
+    secrets:
+      docker_password: ${{ needs.aws.outputs.docker_password }}
+
+  update-to:
+    name: update to
+    needs: [ "composer-stage", "build-stage", "short-sha" ]
+    uses: tvbstw/workflow_templates/.github/workflows/update-repo.yaml@master
+    with:
+      image_tag: ${{ needs.short-sha.outputs.short_sha }}
+      target_repository: tvbstw/health_ops
+      target_environment: stage
+      yaml_path: "(.image.backend.tag , .image.backstage.tag )"
+    secrets:
+      target_repository_token: ${{ secrets.token }}
+
+      
